@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=, initial-scale=1.0" />
+    <title>Project 2 APIs</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Project 2: APIs</h1>
+      <h2>Sentence Fixer</h2>
+    </header>
+
+    <main>
+      <div class="searchForm">
+        <form action="submit">
+          <label for="searchField">Type a sentence:</label>
+          <textarea
+            name="searchField"
+            id="searchField"
+            placeholder='ex: "They&apos;re humid, prepossessing Homo sapiens with full-sized aortic pumps."'
+            autofocus
+          ></textarea>
+          <input type="submit" value="Find it!" />
+        </form>
+      </div>
+
+      <div class="sentenceContainer"></div>
+
+      <div class="definitions-container hide">
+        <!-- Definition boxes will be generated here -->
+      </div>
+    </main>
+
+    <footer>
+      <div class="merriamWLogo">
+        <img src="./MWLogo_DarkBG_120x120_2x.png" alt="Merriam Webster Logo" />
+      </div>
+      <div class="footerText">
+        <p>Created in the Accelerated Javascript Course with Juno College</p>
+        <p>Created with the Merriam-Webster Dictionary API</p>
+      </div>
+      <div class="JunoLogo">
+        <img src="./Juno-College--300x300.webp" alt="Juno College Logo" />
+      </div>
+    </footer>
+
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.js"
+      integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+      crossorigin="anonymous"
+    ></script>
+    <script src="./script.js"></script>
+  </body>
+</html>
