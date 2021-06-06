@@ -71,6 +71,7 @@ textarea:focus {
   box-shadow: 1px 1px 5px black;
   max-height: 50vh;
   overflow-y: auto;
+  background-color: white;
 }
 
 .definitions-container * {
@@ -88,6 +89,7 @@ textarea:focus {
 
 .synonyms-box,
 .definition-box {
+  background-color: white;
   width: 100%;
 }
 

@@ -115,8 +115,31 @@ app.handleDefinitonContainer = async function (query) {
 app.displaySentence = function (sentence) {
   $(".searchForm").addClass("hide");
   let sentenceHTML = ``;
-  sentenceHTML += `<span>The</span> <span>quick</span>, <span>brown</span> <span>fox</span> <span>jumps</span> <span>over</span> <span>the</span> <span>lazy</span> <span>dog</span>.`;
+  let i = 0;
+  let curWord = "";
+  // parse char by char through sentence
+  while (i < sentence.length) {
+    const curChar = sentence[i];
+    // if char is a letter, add to word
+    if (/[a-zA-Z]/.test(curChar)) {
+      curWord += curChar;
+    } else {
+      // punctuation or space found
+      // if word is not empty:
+      if (curWord) {
+        // add word within span tags to HTML
+        sentenceHTML += `<span>${curWord}</span>`;
+        curWord = "";
+      }
+      // add trailing punctuation or spaces after word
+      sentenceHTML += curChar;
+    }
+    i++;
+  }
+  console.log(sentenceHTML);
+
   // create an array of words without punctuation, then loop through original sentence to insert spans
+  console.log(sentenceHTML);
   $(".sentenceContainer").append(`<p>${sentenceHTML}</p>`);
 };
 
