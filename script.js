@@ -12,15 +12,15 @@ app.definitionPromise;
 
 app.clearFields = () => {
   $("#searchField").val("");
-  $(".definitions-container").empty();
+  $("#definitionsModal").empty();
   $(".thesaurus").empty();
 };
 
 app.getButtonValue = function () {
   // create a promise to await a button click for index value of definition array
   return new Promise((resolve, reject) => {
-    // using bubbling, listen for button clicks within .definitions-container
-    $(".definitions-container").on("click", "button", function (e) {
+    // using bubbling, listen for button clicks within #definitionsModal
+    $("#definitionsModal").on("click", "button", function (e) {
       resolve(e.currentTarget.value);
     });
   });
@@ -69,7 +69,7 @@ app.displayDefinitions = function (defArray, query) {
           </div>
         </button>`;
       // append all above HTML to .definitions-container
-      $(".definitions-container").append(definitionBoxHTML);
+      $("#definitionsModal").append(definitionBoxHTML);
     }
   }
 };
@@ -92,7 +92,7 @@ app.displaySynonyms = function (curDefinition) {
         ${synonymsUL}
       </ul>
     </div>`;
-  $(".definitions-container").append(synonymBoxHTML);
+  $("#definitionsModal").append(synonymBoxHTML);
 };
 
 app.handleDefinitonContainer = async function (query) {
@@ -122,7 +122,7 @@ app.displaySentence = function (sentence) {
   while (i < sentence.length) {
     const curChar = sentence[i];
     // if char is a letter or ' , add to word
-    if (/[a-zA-Z, ']/.test(curChar)) {
+    if (/[a-zA-Z']/.test(curChar)) {
       curWord += curChar;
     } else {
       // punctuation or space found
@@ -149,16 +149,30 @@ app.displaySentence = function (sentence) {
 };
 
 app.init = () => {
-  // event listener to capture escape key and close definition modal,
-  // capture enter key for textarea submission
+  // event listener to capture keypresses
   $(document).keydown(function (e) {
+    // if ESC press, close definition modal
     if (e.keyCode == app.KEYCODE_ESC) {
-      $(".definitions-container").addClass("hide");
+      $("#definitionsModal").addClass("hide");
     }
-    if (e.keyCode == app.KEYCODE_ENTER) {
+    // if enter pressed (without shift), submit form
+    if (e.keyCode == app.KEYCODE_ENTER && !e.shiftKey) {
       $(".searchForm").submit();
     }
   });
+
+  //https://stackoverflow.com/questions/37573608/how-to-make-modal-close-on-click-outside/37573735
+  // event listener to close modal when clicked outside
+  // $("body").click(function (e) {
+  //   console.log(e);
+  //   if (
+  //     // !$(e.target).closest("#definitionsModalRoot").length &&
+  //     !$(e.target).is("#definitionsModal")
+  //   ) {
+  //     // $("#definitionsModal").addClass("hide");
+  //     alert("not modal");
+  //   }
+  // });
 };
 
 $(function () {
@@ -173,15 +187,15 @@ $(function () {
       // clear fields
       app.clearFields();
       // updated definitions-container position to be right under a given word
-      $(".definitions-container").css("left", e.currentTarget.offsetLeft);
-      $(".definitions-container").css(
+      $("#definitionsModal").css("left", e.currentTarget.offsetLeft);
+      $("#definitionsModal").css(
         "top",
         e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 5
       );
-      $(".definitions-container").removeClass("hide");
+      $("#definitionsModal").removeClass("hide");
       app.handleDefinitonContainer(e.currentTarget.innerText).then(res => {
         e.currentTarget.innerText = res;
-        $(".definitions-container").addClass("hide");
+        $("#definitionsModal").addClass("hide");
       });
     });
   });
