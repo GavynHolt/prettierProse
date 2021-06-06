@@ -48,17 +48,21 @@ app.getThesaurusReference = word => {
 
 // Display definitions that match query
 app.displayDefinitions = function (defArray, query) {
-  // generate definitions from shortdefs property
-  for (let i = 0; i < defArray.length; i++) {
-    // only print entries which match query exactly ("Headword" must mach query)
-    if (defArray[i].hwi.hw === query) {
-      let shortDefsHTML = ``;
-      defArray[i].shortdef.forEach(definition => {
-        shortDefsHTML += `<li><p>${definition}</p></li>`;
-      });
-      // generate HTML for entire box of current definition
-      // button stores array index to later retrieve synonyms
-      let definitionBoxHTML = `
+  // counter for word matches to be checked at end of function
+  let matches = 0;
+  try {
+    // generate definitions from shortdefs property
+    for (let i = 0; i < defArray.length; i++) {
+      // only print entries which match query exactly ("Headword" must mach query)
+      if (defArray[i].hwi.hw === query) {
+        matches++;
+        let shortDefsHTML = ``;
+        defArray[i].shortdef.forEach(definition => {
+          shortDefsHTML += `<li><p>${definition}</p></li>`;
+        });
+        // generate HTML for entire box of current definition
+        // button stores array index to later retrieve synonyms
+        let definitionBoxHTML = `
         <button value=${i}>
           <div class="definition-box">
             <h3 class="searchedWord">${defArray[i].hwi.hw}</h3>
@@ -68,8 +72,16 @@ app.displayDefinitions = function (defArray, query) {
             </ol>
           </div>
         </button>`;
-      // append all above HTML to .definitions-container
-      $("#definitionsModal").append(definitionBoxHTML);
+        // append all above HTML to .definitions-container
+        $("#definitionsModal").append(definitionBoxHTML);
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    console.log("no such entry in thesaurus");
+  } finally {
+    if (!matches) {
+      $("#definitionsModal").append(`<p>No results found.</p>`);
     }
   }
 };
@@ -80,6 +92,7 @@ app.displaySynonyms = function (curDefinition) {
   // for now, get the first entry of synonyms
   let synonymsUL = ``;
   // loop through all possible synonyms and append to synonymsUL
+  console.log(curDefinition);
   for (let i = 0; i < curDefinition.meta.syns.length; i++) {
     curDefinition.meta.syns[i].forEach(synonym => {
       synonymsUL += `<li><p>${synonym}</p></li>`;
