@@ -45,29 +45,8 @@ app.getThesaurusReference = word => {
   });
 };
 
-// takes in a single definition object from definitionArray
-app.displaySynonyms = function (curDefinition) {
-  app.clearFields();
-  // for now, get the first entry of synonyms
-  let synonymsUL = ``;
-  // loop through all possible synonyms and append to synonymsUL
-  for (let i = 0; i < curDefinition.meta.syns.length; i++) {
-    curDefinition.meta.syns[i].forEach(synonym => {
-      synonymsUL += `<li><p>${synonym}</p></li>`;
-    });
-  }
-  let synonymBoxHTML = `
-    <div class="synonyms-box">
-      <h3>Similar Words...</h3>
-      <ul class="thesaurus">
-        ${synonymsUL}
-      </ul>
-    </div>`;
-  $(".definitions-container").append(synonymBoxHTML);
-};
-
 // Display definitions that match query
-app.displayThesaurusDefinition = function (defArray, query) {
+app.displayDefinitions = function (defArray, query) {
   // generate definitions from shortdefs property
   for (let i = 0; i < defArray.length; i++) {
     // only print entries which match query exactly ("Headword" must mach query)
@@ -94,6 +73,27 @@ app.displayThesaurusDefinition = function (defArray, query) {
   }
 };
 
+// takes in a single definition object from definitionArray, and outputs all related synonyms
+app.displaySynonyms = function (curDefinition) {
+  app.clearFields();
+  // for now, get the first entry of synonyms
+  let synonymsUL = ``;
+  // loop through all possible synonyms and append to synonymsUL
+  for (let i = 0; i < curDefinition.meta.syns.length; i++) {
+    curDefinition.meta.syns[i].forEach(synonym => {
+      synonymsUL += `<li><p>${synonym}</p></li>`;
+    });
+  }
+  let synonymBoxHTML = `
+    <div class="synonyms-box">
+      <h3>Similar Words...</h3>
+      <ul class="thesaurus">
+        ${synonymsUL}
+      </ul>
+    </div>`;
+  $(".definitions-container").append(synonymBoxHTML);
+};
+
 app.handleDefinitonContainer = async function (query) {
   // set the promise from Thesaurus API
   const promise = app.getThesaurusReference(query);
@@ -101,12 +101,13 @@ app.handleDefinitonContainer = async function (query) {
   const definitionArray = await promise.then(res => res);
 
   // get and display definition using array
-  app.displayThesaurusDefinition(definitionArray, query);
+  app.displayDefinitions(definitionArray, query);
 
   // when definition is clicked, get button value and display synonyms for that definition
   const buttonIdx = await app.getButtonValue().then(res => res);
   app.displaySynonyms(definitionArray[buttonIdx]);
 
+  // event listener to get synonym selected from user
   const newWord = await app.getSynonymChoice();
   return newWord;
 };
