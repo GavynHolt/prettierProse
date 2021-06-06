@@ -1,6 +1,7 @@
 const app = {};
 
-app.KEYCODE_ESC = 27; //ACII Keycode for ESC
+app.KEYCODE_ESC = 27; //ASCII Keycode for ESC
+app.KEYCODE_ENTER = 13; // ASCII Keycode for ENTER
 
 app.thesaurusKey = "9f59c76e-4541-4e94-aeb5-47747d6c0ef0";
 app.thesaurusUrl =
@@ -86,7 +87,7 @@ app.displaySynonyms = function (curDefinition) {
   }
   let synonymBoxHTML = `
     <div class="synonyms-box">
-      <h3>Similar Words...</h3>
+      <h3>Synonyns:</h3>
       <ul class="thesaurus">
         ${synonymsUL}
       </ul>
@@ -120,8 +121,8 @@ app.displaySentence = function (sentence) {
   // parse char by char through sentence
   while (i < sentence.length) {
     const curChar = sentence[i];
-    // if char is a letter, add to word
-    if (/[a-zA-Z]/.test(curChar)) {
+    // if char is a letter or ' , add to word
+    if (/[a-zA-Z, ']/.test(curChar)) {
       curWord += curChar;
     } else {
       // punctuation or space found
@@ -148,10 +149,14 @@ app.displaySentence = function (sentence) {
 };
 
 app.init = () => {
-  // event listener to capture escape key and close definition modal
+  // event listener to capture escape key and close definition modal,
+  // capture enter key for textarea submission
   $(document).keydown(function (e) {
     if (e.keyCode == app.KEYCODE_ESC) {
       $(".definitions-container").addClass("hide");
+    }
+    if (e.keyCode == app.KEYCODE_ENTER) {
+      $(".searchForm").submit();
     }
   });
 };
