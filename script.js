@@ -136,6 +136,10 @@ app.displaySentence = function (sentence) {
     }
     i++;
   }
+  // fixes edge case of no punctuation at end of sentence, adding final word
+  if (curWord) {
+    sentenceHTML += `<span>${curWord}</span>`;
+  }
   console.log(sentenceHTML);
 
   // create an array of words without punctuation, then loop through original sentence to insert spans
