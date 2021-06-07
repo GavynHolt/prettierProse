@@ -112,6 +112,7 @@ span,
   border-radius: 5px;
 }
 
+#definitionsModal button:hover,
 .definition-box:hover,
 span:hover,
 .synonyms-box li p:hover {

@@ -48,6 +48,8 @@ app.getThesaurusReference = word => {
 
 // Display definitions that match query
 app.displayDefinitions = function (defArray, query) {
+  // clear fields
+  app.clearFields();
   // counter for word matches to be checked at end of function
   let matches = 0;
   try {
@@ -63,15 +65,16 @@ app.displayDefinitions = function (defArray, query) {
         // generate HTML for entire box of current definition
         // button stores array index to later retrieve synonyms
         let definitionBoxHTML = `
-        <button value=${i}>
-          <div class="definition-box">
+        <div class="definition-box">
+          <button value=${i}>
             <h3 class="searchedWord">${defArray[i].hwi.hw}</h3>
-            <h4 class="fl">${defArray[i].fl}</h4>
+            <h4>${defArray[i].fl}</h4>
             <ol class="definitions">
               ${shortDefsHTML}
             </ol>
-          </div>
-        </button>`;
+          </button>
+        </div>
+        `;
         // append all above HTML to .definitions-container
         $("#definitionsModal").append(definitionBoxHTML);
       }
@@ -174,18 +177,23 @@ app.init = () => {
     }
   });
 
-  //https://stackoverflow.com/questions/37573608/how-to-make-modal-close-on-click-outside/37573735
+  //
   // event listener to close modal when clicked outside
-  // $("body").click(function (e) {
-  //   console.log(e);
-  //   if (
-  //     // !$(e.target).closest("#definitionsModalRoot").length &&
-  //     !$(e.target).is("#definitionsModal")
-  //   ) {
-  //     // $("#definitionsModal").addClass("hide");
-  //     alert("not modal");
-  //   }
-  // });
+  $("body").on("click", function (e) {
+    console.log(e.target);
+    console.log($("#definitionsModal").closest("body"));
+    console.log(
+      $(e.target).is("#definitionsModal") ||
+        $(e.target).is("#definitionsModal *")
+    );
+    // if (
+    //   !$(e.target).closest("#definitionsModalRoot").length &&
+    //   !$(e.target).is("#definitionsModal") &&
+    //   !$("#definitonsModal").hasClass("hide")
+    // ) {
+    //   $("#definitionsModal").addClass("hide");
+    // }
+  });
 };
 
 $(function () {
@@ -197,8 +205,6 @@ $(function () {
     app.displaySentence(sentence);
     // event listener to look up definitions when span clicked
     $("span").on("click", function (e) {
-      // clear fields
-      app.clearFields();
       // updated definitions-container position to be right under a given word
       $("#definitionsModal").css("left", e.currentTarget.offsetLeft);
       $("#definitionsModal").css(
@@ -207,7 +213,9 @@ $(function () {
       );
       $("#definitionsModal").removeClass("hide");
       app.handleDefinitonContainer(e.currentTarget.innerText).then(res => {
+        // change word in sentence to new word
         e.currentTarget.innerText = res;
+        // hide modal
         $("#definitionsModal").addClass("hide");
       });
     });
