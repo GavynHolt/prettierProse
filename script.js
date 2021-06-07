@@ -16,32 +16,6 @@ app.clearFields = () => {
   $(".thesaurus").empty();
 };
 
-app.getDefinitionIndexValue = function () {
-  // create a promise to await a button click for index value of definition array
-  return new Promise((resolve, reject) => {
-    // using bubbling, listen for div clicks within #definitionsModal
-    $("#definitionsModal").on("click", "div", function (e) {
-      // gets data-value from div
-      resolve($(this).data("value"));
-    });
-  });
-};
-
-app.getIndex = function (value) {
-  return new Promise((resolve, reject) => {
-    console.log("btn value: " + value);
-    resolve(value);
-  });
-};
-
-app.getSynonymChoice = function () {
-  return new Promise((resolve, reject) => {
-    $(".synonyms-box li p").on("click", function (e) {
-      resolve(e.currentTarget.innerText);
-    });
-  });
-};
-
 // Call to Thesaurus API, returns an array of entries
 app.getThesaurusReference = word => {
   return $.ajax({
@@ -52,6 +26,40 @@ app.getThesaurusReference = word => {
       key: app.thesaurusKey,
     },
   });
+};
+
+app.displaySentence = function (sentence) {
+  $(".searchForm").addClass("hide");
+  let sentenceHTML = ``;
+  let i = 0;
+  let curWord = "";
+  // parse char by char through sentence
+  while (i < sentence.length) {
+    const curChar = sentence[i];
+    // if char is a letter or ' , add to word
+    if (/[a-zA-Z']/.test(curChar)) {
+      curWord += curChar;
+    } else {
+      // punctuation or space found
+      // if word is not empty:
+      if (curWord) {
+        // add word within span tags to HTML
+        sentenceHTML += `<span>${curWord}</span>`;
+        curWord = "";
+      }
+      // add trailing punctuation or spaces after word
+      sentenceHTML += curChar;
+    }
+    i++;
+  }
+  // fixes edge case of no punctuation at end of sentence, adding final word
+  if (curWord) {
+    sentenceHTML += `<span>${curWord}</span>`;
+  }
+  console.log(sentenceHTML);
+  // Insert completely constructed sentence HTML on page
+  $(".sentenceContainer").append(`<p>${sentenceHTML}</p>`);
+  $(".instructions").text("Click on any word to replace with a synonym...");
 };
 
 // Display definitions that match query
@@ -97,6 +105,17 @@ app.displayDefinitions = function (defArray, query) {
   // app.modalEventListener();
 };
 
+app.getDefinitionIndexValue = function () {
+  // create a promise to await a button click for index value of definition array
+  return new Promise((resolve, reject) => {
+    // using bubbling, listen for div clicks within #definitionsModal
+    $("#definitionsModal").on("click", "div", function (e) {
+      // gets data-value from div
+      resolve($(this).data("value"));
+    });
+  });
+};
+
 // takes in a single definition object from definitionArray, and outputs all related synonyms
 app.displaySynonyms = function (curDefinition) {
   app.clearFields();
@@ -118,7 +137,16 @@ app.displaySynonyms = function (curDefinition) {
   $("#definitionsModal").append(synonymBoxHTML);
 };
 
-app.handleDefinitonModal = async function (query) {
+app.getSynonymChoice = function () {
+  return new Promise((resolve, reject) => {
+    $(".synonyms-box li p").on("click", function (e) {
+      resolve(e.currentTarget.innerText);
+    });
+  });
+};
+
+app.handleDefinitonModal = async function (event) {
+  let query = event.currentTarget.innerText;
   // set the promise from Thesaurus API
   const promise = app.getThesaurusReference(query);
   // get array of definitions for reference
@@ -133,40 +161,12 @@ app.handleDefinitonModal = async function (query) {
 
   // event listener to get synonym selected from user
   const newWord = await app.getSynonymChoice();
-  return newWord;
-};
 
-app.displaySentence = function (sentence) {
-  $(".searchForm").addClass("hide");
-  let sentenceHTML = ``;
-  let i = 0;
-  let curWord = "";
-  // parse char by char through sentence
-  while (i < sentence.length) {
-    const curChar = sentence[i];
-    // if char is a letter or ' , add to word
-    if (/[a-zA-Z']/.test(curChar)) {
-      curWord += curChar;
-    } else {
-      // punctuation or space found
-      // if word is not empty:
-      if (curWord) {
-        // add word within span tags to HTML
-        sentenceHTML += `<span>${curWord}</span>`;
-        curWord = "";
-      }
-      // add trailing punctuation or spaces after word
-      sentenceHTML += curChar;
-    }
-    i++;
-  }
-  // fixes edge case of no punctuation at end of sentence, adding final word
-  if (curWord) {
-    sentenceHTML += `<span>${curWord}</span>`;
-  }
-  console.log(sentenceHTML);
-  // Insert completely constructed sentence HTML on page
-  $(".sentenceContainer").append(`<p>${sentenceHTML}</p>`);
+  // change word in sentence to new word
+  event.currentTarget.innerText = newWord;
+
+  // hide modal
+  $("#definitionsModal").addClass("hide");
 };
 
 app.modalEventListener = function () {
@@ -180,6 +180,14 @@ app.modalEventListener = function () {
       $("#definitionsModal").addClass("hide");
     }
   });
+};
+
+// display definition modal underneath clicked word
+app.displayDefinitionModal = function (topPos, leftPos) {
+  // updated definitions-container position to be right under a given word
+  $("#definitionsModal").css("left", leftPos);
+  $("#definitionsModal").css("top", topPos);
+  $("#definitionsModal").removeClass("hide");
 };
 
 app.init = () => {
@@ -199,21 +207,18 @@ app.init = () => {
     e.preventDefault();
     const sentence = $("#searchField").val().trim();
     app.displaySentence(sentence);
+
     // event listener to look up definitions when span clicked
     $("span").on("click", function (e) {
-      // updated definitions-container position to be right under a given word
-      $("#definitionsModal").css("left", e.currentTarget.offsetLeft);
-      $("#definitionsModal").css(
-        "top",
-        e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 5
-      );
-      $("#definitionsModal").removeClass("hide");
-      app.handleDefinitonModal(e.currentTarget.innerText).then(res => {
-        // change word in sentence to new word
-        e.currentTarget.innerText = res;
-        // hide modal
-        $("#definitionsModal").addClass("hide");
-      });
+      // get top and left offset parameters for Modal
+      const top = e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 5;
+      const left = e.currentTarget.offsetLeft;
+
+      //display definition Modal
+      app.displayDefinitionModal(top, left);
+
+      //handle logic within Modal to ultimately select a new word
+      app.handleDefinitonModal(e);
     });
   });
 };

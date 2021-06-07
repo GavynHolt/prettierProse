@@ -9,40 +9,63 @@ html { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: 
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; border: 0; padding: 0; white-space: nowrap; clip-path: inset(100%); clip: rect(0 0 0 0); overflow: hidden;}
 
 html {
-  height: 100vh;
-}
-.wrapper {
-  max-width: 1200px;
-  width: 90%;
-  margin: 0 auto;
+  height: 100%;
 }
 
 body {
   font-family:Verdana, Geneva, Tahoma, sans-serif;
-  height: 100vh;
+  height: 100%;
+  padding: 1rem;
 }
 
 h1 { 
   margin: 0;
-  padding: 20px 0; 
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-h2 { 
+  padding: 0; 
   font-size: 3rem;
   text-align: center;
 }
 
-.searchForm {
-  display: flex;
-  justify-content: center;
+h2 { 
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  font-style: italic;
+  text-align: center;
 }
 
+h3 {
+  text-align: center;
+  font-size: 1rem;
+}
+
+header {
+  margin: 0 auto 10px auto;
+  max-width: 700px;
+  box-shadow: 0 4px 7px black;
+  border-radius: 5px;
+}
+
+.searchForm {
+  flex: 0 0 700px;
+}
+
+main { 
+  position: relative;
+  top: 10%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: block;
+  border: 1px solid black;
+  box-shadow: 3px 3px 3px cadetblue;
+  padding: 25px;
+  background-color: rgba(80, 80, 163, 0.055);
+  border-radius: 10px;
+
+}
 .searchForm form {
   display: flex;
   flex-direction: column;
-  width: 75%;
+  align-items: stretch;
 }
 
 .searchForm form textarea {
@@ -83,15 +106,6 @@ textarea:focus {
   text-align: left;
 }
 
-#definitionsModal button {
-  background-color: white;
-  border: 0;
-  margin: 0;
-  padding: 0 ;
-  border-radius: 8px;
-  width: 100%;
-}
-
 .synonyms-box,
 .definition-box {
   background-color: white;
@@ -112,14 +126,13 @@ span,
   border-radius: 5px;
 }
 
-#definitionsModal button:hover,
 .definition-box:hover,
 span:hover,
 .synonyms-box li p:hover {
   background-color:lightskyblue;
 }
 
-h3 {
+h3.searchedWord  {
   margin: 0.5rem 0 0.5rem 20px;
   font-size: 1rem;
   font-weight:700;
@@ -159,7 +172,7 @@ ul {
 }
 
 footer {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
@@ -175,7 +188,7 @@ footer {
 }
 
 .footerText {
-  margin: 0 20px;
+  margin: 0;
 }
 
 footer img {
@@ -187,6 +200,7 @@ footer img {
 
 footer p {
   text-align: center;
+  font-size: calc(0.75rem + 0.25vw);
 }
 
 a {
