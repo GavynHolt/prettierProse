@@ -16,13 +16,21 @@ app.clearFields = () => {
   $(".thesaurus").empty();
 };
 
-app.getButtonValue = function () {
+app.getDefinitionIndexValue = function () {
   // create a promise to await a button click for index value of definition array
   return new Promise((resolve, reject) => {
-    // using bubbling, listen for button clicks within #definitionsModal
-    $("#definitionsModal").on("click", "button", function (e) {
-      resolve(e.currentTarget.value);
+    // using bubbling, listen for div clicks within #definitionsModal
+    $("#definitionsModal").on("click", "div", function (e) {
+      // gets data-value from div
+      resolve($(this).data("value"));
     });
+  });
+};
+
+app.getIndex = function (value) {
+  return new Promise((resolve, reject) => {
+    console.log("btn value: " + value);
+    resolve(value);
   });
 };
 
@@ -65,14 +73,12 @@ app.displayDefinitions = function (defArray, query) {
         // generate HTML for entire box of current definition
         // button stores array index to later retrieve synonyms
         let definitionBoxHTML = `
-        <div class="definition-box">
-          <button value=${i}>
-            <h3 class="searchedWord">${defArray[i].hwi.hw}</h3>
-            <h4>${defArray[i].fl}</h4>
-            <ol class="definitions">
-              ${shortDefsHTML}
-            </ol>
-          </button>
+        <div class="definition-box" data-value="${i}">
+          <h3 class="searchedWord">${defArray[i].hwi.hw}</h3>
+          <h4>${defArray[i].fl}</h4>
+          <ol class="definitions">
+            ${shortDefsHTML}
+          </ol>
         </div>
         `;
         // append all above HTML to .definitions-container
@@ -87,6 +93,8 @@ app.displayDefinitions = function (defArray, query) {
       $("#definitionsModal").append(`<p>No results found.</p>`);
     }
   }
+  //attach an event listener
+  // app.modalEventListener();
 };
 
 // takes in a single definition object from definitionArray, and outputs all related synonyms
@@ -95,7 +103,6 @@ app.displaySynonyms = function (curDefinition) {
   // for now, get the first entry of synonyms
   let synonymsUL = ``;
   // loop through all possible synonyms and append to synonymsUL
-  console.log(curDefinition);
   for (let i = 0; i < curDefinition.meta.syns.length; i++) {
     curDefinition.meta.syns[i].forEach(synonym => {
       synonymsUL += `<li><p>${synonym}</p></li>`;
@@ -120,8 +127,8 @@ app.handleDefinitonContainer = async function (query) {
   // get and display definition using array
   app.displayDefinitions(definitionArray, query);
 
-  // when definition is clicked, get button value and display synonyms for that definition
-  const buttonIdx = await app.getButtonValue().then(res => res);
+  // when definition is clicked, get definiton index value and display synonyms for that definition
+  const buttonIdx = await app.getDefinitionIndexValue().then(res => res);
   app.displaySynonyms(definitionArray[buttonIdx]);
 
   // event listener to get synonym selected from user
@@ -164,6 +171,19 @@ app.displaySentence = function (sentence) {
   $(".sentenceContainer").append(`<p>${sentenceHTML}</p>`);
 };
 
+app.modalEventListener = function () {
+  // event listener to close modal when clicked outside
+  $("body").on("click", function (e) {
+    let isModal =
+      $(e.target).is("#definitionsModal") ||
+      $(e.target).is("#definitionsModal *");
+    console.log($(e.target).closest("#definitionsModalRoot"));
+    if (!isModal) {
+      $("#definitionsModal").addClass("hide");
+    }
+  });
+};
+
 app.init = () => {
   // event listener to capture keypresses
   $(document).keydown(function (e) {
@@ -175,24 +195,6 @@ app.init = () => {
     if (e.keyCode == app.KEYCODE_ENTER && !e.shiftKey) {
       $(".searchForm").submit();
     }
-  });
-
-  //
-  // event listener to close modal when clicked outside
-  $("body").on("click", function (e) {
-    console.log(e.target);
-    console.log($("#definitionsModal").closest("body"));
-    console.log(
-      $(e.target).is("#definitionsModal") ||
-        $(e.target).is("#definitionsModal *")
-    );
-    // if (
-    //   !$(e.target).closest("#definitionsModalRoot").length &&
-    //   !$(e.target).is("#definitionsModal") &&
-    //   !$("#definitonsModal").hasClass("hide")
-    // ) {
-    //   $("#definitionsModal").addClass("hide");
-    // }
   });
 };
 
