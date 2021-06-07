@@ -57,8 +57,8 @@ main {
   display: block;
   border: 1px solid black;
   box-shadow: 3px 3px 3px cadetblue;
-  padding: 25px;
-  background-color: rgba(80, 80, 163, 0.055);
+  padding: 25px 30px;
+  background-color: rgba(70, 70, 165, 0.055);
   border-radius: 10px;
 
 }

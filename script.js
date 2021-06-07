@@ -29,6 +29,7 @@ app.getThesaurusReference = word => {
 };
 
 app.displaySentence = function (sentence) {
+  $(".startOver").removeClass("hide");
   $(".searchForm").addClass("hide");
   let sentenceHTML = ``;
   let i = 0;
@@ -188,6 +189,16 @@ app.displayDefinitionModal = function (topPos, leftPos) {
   $("#definitionsModal").css("left", leftPos);
   $("#definitionsModal").css("top", topPos);
   $("#definitionsModal").removeClass("hide");
+};
+
+app.startOver = function () {
+  app.clearFields();
+  $(".searchForm").removeClass("hide");
+  $(".sentenceContainer").empty();
+  $(".instructions").text(
+    "To start: Type a sentence that is in need of a fresh perspective, and submit!"
+  );
+  $(".startOver").addClass("hide");
 };
 
 app.init = () => {
