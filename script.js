@@ -118,7 +118,7 @@ app.displaySynonyms = function (curDefinition) {
   $("#definitionsModal").append(synonymBoxHTML);
 };
 
-app.handleDefinitonContainer = async function (query) {
+app.handleDefinitonModal = async function (query) {
   // set the promise from Thesaurus API
   const promise = app.getThesaurusReference(query);
   // get array of definitions for reference
@@ -165,9 +165,7 @@ app.displaySentence = function (sentence) {
     sentenceHTML += `<span>${curWord}</span>`;
   }
   console.log(sentenceHTML);
-
-  // create an array of words without punctuation, then loop through original sentence to insert spans
-  console.log(sentenceHTML);
+  // Insert completely constructed sentence HTML on page
   $(".sentenceContainer").append(`<p>${sentenceHTML}</p>`);
 };
 
@@ -196,10 +194,6 @@ app.init = () => {
       $(".searchForm").submit();
     }
   });
-};
-
-$(function () {
-  app.init();
 
   $(".searchForm").on("submit", function (e) {
     e.preventDefault();
@@ -214,7 +208,7 @@ $(function () {
         e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 5
       );
       $("#definitionsModal").removeClass("hide");
-      app.handleDefinitonContainer(e.currentTarget.innerText).then(res => {
+      app.handleDefinitonModal(e.currentTarget.innerText).then(res => {
         // change word in sentence to new word
         e.currentTarget.innerText = res;
         // hide modal
@@ -222,4 +216,8 @@ $(function () {
       });
     });
   });
+};
+
+$(function () {
+  app.init();
 });
