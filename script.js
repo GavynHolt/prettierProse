@@ -145,7 +145,7 @@ app.getSynonymChoice = function () {
 };
 
 app.handleDefinitonModal = async function (event) {
-  let query = event.currentTarget.innerText;
+  let query = event.currentTarget.innerText.toLowerCase();
   // set the promise from Thesaurus API
   const promise = app.getThesaurusReference(query);
   // get array of definitions for reference
@@ -219,7 +219,7 @@ app.init = () => {
 
   $(".searchForm").on("submit", function (e) {
     e.preventDefault();
-    const sentence = $("#searchField").val().trim().toLowerCase();
+    const sentence = $("#searchField").val().trim();
     app.displaySentence(sentence);
 
     // event listener to look up definitions when span clicked
