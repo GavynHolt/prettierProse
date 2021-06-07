@@ -80,24 +80,22 @@ app.displayDefinitions = function (defArray, query) {
           shortDefsHTML += `<li><p>${definition}</p></li>`;
         });
         // generate HTML for entire box of current definition
-        // button stores array index to later retrieve synonyms
-        let definitionBoxHTML = `
+        const definitionBoxHTML = `
         <div class="definition-box" data-value="${i}">
           <h3 class="searchedWord">${defArray[i].hwi.hw}</h3>
           <h4>${defArray[i].fl}</h4>
           <ol class="definitions">
             ${shortDefsHTML}
           </ol>
-        </div>
-        `;
-        // append all above HTML to .definitions-container
+        </div>`;
+        // append all above HTML to #definitionsModal
         $("#definitionsModal").append(definitionBoxHTML);
       }
     }
   } catch (err) {
-    console.log(err);
     console.log("no such entry in thesaurus");
   } finally {
+    // This message shows both if there are results from the API but no exact match, or nothing at all from API
     if (!matches) {
       $("#definitionsModal").append(`<p>No results found.</p>`);
     }
@@ -173,12 +171,18 @@ app.handleDefinitonModal = async function (event) {
 
 app.modalEventListener = function () {
   // event listener to close modal when clicked outside
-  $("body").on("click", function (e) {
+  // $("#definitionsModal").focusout(function () {
+  //   if ($(this).has(document.activeElement).length == 0) {
+  //     $("#definitionsModal").addClass("hide");
+  //   }
+  // });
+
+  $(document).on("click", function (e) {
     let isModal =
       $(e.target).is("#definitionsModal") ||
       $(e.target).is("#definitionsModal *");
     console.log(e.target);
-    console.log($(e.target).closest("#definitionsModalRoot"));
+    console.log($(e.target).closest("#definitionsModal").length);
     // if (!isModal) {
     //   $("#definitionsModal").addClass("hide");
     //   $("body").off("click");
@@ -187,7 +191,7 @@ app.modalEventListener = function () {
 };
 
 // display definition modal underneath clicked word
-app.displayDefinitionModal = function (topPos, leftPos) {
+app.displayDefinitionsModal = function (topPos, leftPos) {
   // updated definitions-container position to be right under a given word
   $("#definitionsModal").css("left", leftPos);
   $("#definitionsModal").css("top", topPos);
@@ -229,7 +233,7 @@ app.init = () => {
       const left = e.currentTarget.offsetLeft;
 
       //display definition Modal
-      app.displayDefinitionModal(top, left);
+      app.displayDefinitionsModal(top, left);
 
       //handle logic within Modal to ultimately select a new word
       app.handleDefinitonModal(e);
