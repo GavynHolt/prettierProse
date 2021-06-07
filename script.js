@@ -102,8 +102,6 @@ app.displayDefinitions = function (defArray, query) {
       $("#definitionsModal").append(`<p>No results found.</p>`);
     }
   }
-  //attach an event listener
-  // app.modalEventListener();
 };
 
 app.getDefinitionIndexValue = function () {
@@ -156,6 +154,9 @@ app.handleDefinitonModal = async function (event) {
   // get and display definition using array
   app.displayDefinitions(definitionArray, query);
 
+  //attach an event listener to close Modal if mouse clicked outside of Modal
+  app.modalEventListener();
+
   // when definition is clicked, get definiton index value and display synonyms for that definition
   const buttonIdx = await app.getDefinitionIndexValue().then(res => res);
   app.displaySynonyms(definitionArray[buttonIdx]);
@@ -176,10 +177,12 @@ app.modalEventListener = function () {
     let isModal =
       $(e.target).is("#definitionsModal") ||
       $(e.target).is("#definitionsModal *");
+    console.log(e.target);
     console.log($(e.target).closest("#definitionsModalRoot"));
-    if (!isModal) {
-      $("#definitionsModal").addClass("hide");
-    }
+    // if (!isModal) {
+    //   $("#definitionsModal").addClass("hide");
+    //   $("body").off("click");
+    // }
   });
 };
 
