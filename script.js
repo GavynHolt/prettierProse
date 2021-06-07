@@ -219,7 +219,7 @@ app.init = () => {
 
   $(".searchForm").on("submit", function (e) {
     e.preventDefault();
-    const sentence = $("#searchField").val().trim();
+    const sentence = $("#searchField").val().trim().toLowerCase();
     app.displaySentence(sentence);
 
     // event listener to look up definitions when span clicked
