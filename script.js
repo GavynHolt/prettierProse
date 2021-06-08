@@ -28,6 +28,21 @@ app.getThesaurusReference = word => {
   });
 };
 
+app.wordClickListener = function () {
+  // event listener to look up definitions when span clicked
+  $("span").on("click", function (e) {
+    // get top and left offset parameters for Modal
+    const top = e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 5;
+    const left = e.currentTarget.offsetLeft;
+
+    //display definition Modal
+    app.displayDefinitionsModal(top, left);
+
+    //handle logic within Modal to ultimately select a new word
+    app.handleDefinitonModal(e);
+  });
+};
+
 app.displaySentence = function (sentence) {
   $(".startOver").removeClass("hide");
   $(".searchForm").addClass("hide");
@@ -69,7 +84,6 @@ app.displayDefinitions = function (defArray, query) {
   app.clearFields();
   // counter for word matches to be checked at end of function
   let matches = 0;
-  let definitionsBoxHTML = ``;
   let outputHTML = "";
   try {
     // generate definitions from shortdefs property
@@ -91,11 +105,9 @@ app.displayDefinitions = function (defArray, query) {
             </ol>
           </div>`;
         // add current definition HTML to definitionsBoxHTML
-        definitionsBoxHTML += definitionHTML;
+        outputHTML += definitionHTML;
       }
     }
-    // append all above HTML to #definitionsModal
-    outputHTML = `<div>${definitionsBoxHTML}</div>`;
   } catch (err) {
     console.log("no such entry in thesaurus");
   } finally {
@@ -120,79 +132,83 @@ app.getDefinitionIndexValue = function () {
 
 // takes in a single definition object from definitionArray, and outputs all related synonyms
 app.displaySynonyms = function (curDefinition) {
-  app.clearFields();
-  // for now, get the first entry of synonyms
-  let synonymsUL = ``;
-  // loop through all possible synonyms and append to synonymsUL
-  for (let i = 0; i < curDefinition.meta.syns.length; i++) {
-    curDefinition.meta.syns[i].forEach(synonym => {
-      synonymsUL += `<li><p>${synonym}</p></li>`;
-    });
-  }
-  let synonymBoxHTML = `
+  // setTmeout avoids issue with .definition-box detatching before modalEvent listener can register click
+  setTimeout(function () {
+    // for now, get the first entry of synonyms
+    let synonymsUL = ``;
+    // loop through all possible synonyms and append to synonymsUL
+    for (let i = 0; i < curDefinition.meta.syns.length; i++) {
+      curDefinition.meta.syns[i].forEach(synonym => {
+        synonymsUL += `<li><p>${synonym}</p></li>`;
+      });
+    }
+    let synonymBoxHTML = `
     <div class="synonyms-box">
       <h3>Synonyns:</h3>
       <ul class="thesaurus">
         ${synonymsUL}
       </ul>
     </div>`;
-  $("#definitionsModal").append(synonymBoxHTML);
+
+    $("#definitionsModal").html(synonymBoxHTML);
+  }, 50);
 };
 
 app.getSynonymChoice = function () {
   return new Promise((resolve, reject) => {
-    $(".synonyms-box li p").on("click", function (e) {
-      resolve(e.currentTarget.innerText);
-    });
+    setTimeout(function () {
+      $(".synonyms-box").on("click", "p", function (e) {
+        console.log(e.currentTarget.innerText);
+
+        resolve(e.currentTarget.innerText);
+      });
+    }, 50);
   });
 };
 
 app.handleDefinitonModal = async function (event) {
   let query = event.currentTarget.innerText.toLowerCase();
   // set the promise from Thesaurus API
-  const promise = app.getThesaurusReference(query);
   // get array of definitions for reference
-  const definitionArray = await promise.then(res => res);
-
-  // get and display definition using array
-  app.displayDefinitions(definitionArray, query);
+  const definitionArray = await app
+    .getThesaurusReference(query)
+    .then(function (res) {
+      // get and display definition using array
+      app.displayDefinitions(res, query);
+      return res;
+    });
 
   //attach an event listener to close Modal if mouse clicked outside of Modal
   app.modalEventListener();
 
   // when definition is clicked, get definiton index value and display synonyms for that definition
-  const buttonIdx = await app.getDefinitionIndexValue().then(res => res);
+  const definitionIdx = await app.getDefinitionIndexValue();
 
-  app.displaySynonyms(definitionArray[buttonIdx]);
+  app.displaySynonyms(definitionArray[definitionIdx]);
 
   // event listener to get synonym selected from user
-  const newWord = await app.getSynonymChoice();
-
-  // change word in sentence to new word
-  event.currentTarget.innerText = newWord;
-
-  // hide modal
-  $("#definitionsModal").addClass("hide");
+  app.getSynonymChoice().then(function (res) {
+    // change word in sentence to new word
+    event.currentTarget.innerText = res;
+    // hide modal
+    $("#definitionsModal").addClass("hide");
+    // turn off modal listener
+    $(document).off("click");
+  });
 };
 
 app.modalEventListener = function () {
-  // event listener to close modal when clicked outside
-  // $("#definitionsModal").focusout(function () {
-  //   if ($(this).has(document.activeElement).length == 0) {
-  //     $("#definitionsModal").addClass("hide");
-  //   }
-  // });
-
+  // checks to see if click is in modal, closes if not
   $(document).on("click", function (e) {
     let isModal =
       $(e.target).is("#definitionsModal") ||
       $(e.target).is("#definitionsModal *");
-    console.log(e.target);
     console.log($(e.target).closest("#definitionsModal").length);
-    // if (!isModal) {
-    //   $("#definitionsModal").addClass("hide");
-    //   $("body").off("click");
-    // }
+    console.log(e.target);
+    if (!$(e.target).closest("#definitionsModal").length && !isModal) {
+      $("#definitionsModal").addClass("hide");
+      $(document).off("click");
+    }
   });
 };
 
@@ -231,19 +247,7 @@ app.init = () => {
     e.preventDefault();
     const sentence = $("#searchField").val().trim();
     app.displaySentence(sentence);
-
-    // event listener to look up definitions when span clicked
-    $("span").on("click", function (e) {
-      // get top and left offset parameters for Modal
-      const top = e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 5;
-      const left = e.currentTarget.offsetLeft;
-
-      //display definition Modal
-      app.displayDefinitionsModal(top, left);
-
-      //handle logic within Modal to ultimately select a new word
-      app.handleDefinitonModal(e);
-    });
+    app.wordClickListener();
   });
 };
 
