@@ -69,6 +69,8 @@ app.displayDefinitions = function (defArray, query) {
   app.clearFields();
   // counter for word matches to be checked at end of function
   let matches = 0;
+  let definitionsBoxHTML = ``;
+  let outputHTML = "";
   try {
     // generate definitions from shortdefs property
     for (let i = 0; i < defArray.length; i++) {
@@ -80,33 +82,36 @@ app.displayDefinitions = function (defArray, query) {
           shortDefsHTML += `<li><p>${definition}</p></li>`;
         });
         // generate HTML for entire box of current definition
-        const definitionBoxHTML = `
-        <div class="definition-box" data-value="${i}">
-          <h3 class="searchedWord">${defArray[i].hwi.hw}</h3>
-          <h4>${defArray[i].fl}</h4>
-          <ol class="definitions">
-            ${shortDefsHTML}
-          </ol>
-        </div>`;
-        // append all above HTML to #definitionsModal
-        $("#definitionsModal").append(definitionBoxHTML);
+        const definitionHTML = `
+          <div class="definition-box" data-value="${i}">
+            <h3 class="searchedWord">${defArray[i].hwi.hw}</h3>
+            <h4>${defArray[i].fl}</h4>
+            <ol class="definitions">
+              ${shortDefsHTML}
+            </ol>
+          </div>`;
+        // add current definition HTML to definitionsBoxHTML
+        definitionsBoxHTML += definitionHTML;
       }
     }
+    // append all above HTML to #definitionsModal
+    outputHTML = `<div>${definitionsBoxHTML}</div>`;
   } catch (err) {
     console.log("no such entry in thesaurus");
   } finally {
     // This message shows both if there are results from the API but no exact match, or nothing at all from API
     if (!matches) {
-      $("#definitionsModal").append(`<p>No results found.</p>`);
+      outputHTML = `<p>No results found.</p>`;
     }
   }
+  $("#definitionsModal").append(outputHTML);
 };
 
 app.getDefinitionIndexValue = function () {
   // create a promise to await a button click for index value of definition array
   return new Promise((resolve, reject) => {
     // using bubbling, listen for div clicks within #definitionsModal
-    $("#definitionsModal").on("click", "div", function (e) {
+    $("#definitionsModal").on("click", "div", function () {
       // gets data-value from div
       resolve($(this).data("value"));
     });
@@ -157,6 +162,7 @@ app.handleDefinitonModal = async function (event) {
 
   // when definition is clicked, get definiton index value and display synonyms for that definition
   const buttonIdx = await app.getDefinitionIndexValue().then(res => res);
+
   app.displaySynonyms(definitionArray[buttonIdx]);
 
   // event listener to get synonym selected from user

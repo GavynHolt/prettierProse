@@ -25,7 +25,7 @@
         <form action="submit">
           <label for="searchField">Type a sentence:</label>
           <textarea
-            rows="3"
+            rows="5"
             name="searchField"
             id="searchField"
             placeholder='ex: "They&apos;re humid, prepossessing Homo sapiens with full-sized aortic pumps."'
@@ -37,8 +37,10 @@
 
       <div class="sentenceContainer"></div>
 
-      <div id="definitionsModal" class="hide">
-        <!-- Definition boxes will be generated here -->
+      <div id="definitionsModalRoot">
+        <div id="definitionsModal" class="hide">
+          <!-- Definition boxes will be generated here -->
+        </div>
       </div>
     </main>
 
