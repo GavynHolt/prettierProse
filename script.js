@@ -36,19 +36,13 @@ app.wordClickListener = function () {
     // turn off modal listener in case it's already open
     $(document).off("click");
 
-    // get top and left offset parameters for Modal
-    const top = e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 5;
-    const left = e.currentTarget.offsetLeft;
-
-    //display definition Modal
-    app.displayDefinitionsModal(top, left);
-
     //handle logic within Modal to ultimately select a new word
     app.handleDefinitonModal(e);
   });
 };
 
 app.displaySentence = function (sentence) {
+  // display startover button and hide search form
   $(".startOver").removeClass("hide");
   $(".searchForm").addClass("hide");
   let sentenceHTML = ``;
@@ -77,7 +71,6 @@ app.displaySentence = function (sentence) {
   if (curWord) {
     sentenceHTML += `<span>${curWord}</span>`;
   }
-  console.log(sentenceHTML);
   // Insert completely constructed sentence HTML on page
   $(".sentenceContainer").append(`<p>${sentenceHTML}</p>`);
   $(".instructions").text("Click on any word to replace with a synonym...");
@@ -113,20 +106,18 @@ app.displayDefinitions = function (defArray, query) {
         outputHTML += definitionHTML;
       }
     }
-  } catch (err) {
-    console.log("no such entry in thesaurus");
-  } finally {
-    // This message shows both if there are results from the API but no exact match, or nothing at all from API
     if (!matches) {
-      outputHTML = `<p>No results found.</p>`;
+      outputHTML = `<p>No synonyms found.</p>`;
     }
+  } catch (err) {
+    outputHTML = `<p>No definition found.</p>`;
   }
   $("#definitionsModal").append(outputHTML);
 };
 
 app.getDefinitionIndexValue = function () {
   // create a promise to await a button click for index value of definition array
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     // using bubbling, listen for div clicks within #definitionsModal
     $("#definitionsModal").on("click", "div", function () {
       // gets data-value from div
@@ -142,7 +133,7 @@ app.displaySynonyms = function (curDefinition) {
     // for now, get the first entry of synonyms
     let synonymsUL = ``;
     // loop through all possible synonyms and append to synonymsUL
-    for (let i = 0; i < curDefinition.meta.syns.length; i++) {
+    for (let i = 0; i < curDefinition.meta?.syns.length; i++) {
       curDefinition.meta.syns[i].forEach(synonym => {
         synonymsUL += `<li><p>${synonym}</p></li>`;
       });
@@ -156,18 +147,16 @@ app.displaySynonyms = function (curDefinition) {
     </div>`;
 
     $("#definitionsModal").html(synonymBoxHTML);
-  }, 50);
+  }, 0);
 };
 
 app.getSynonymChoice = function () {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     setTimeout(function () {
       $(".synonyms-box").on("click", "p", function (e) {
-        console.log(e.currentTarget.innerText);
-
         resolve(e.currentTarget.innerText);
       });
-    }, 50);
+    }, 0);
   });
 };
 
@@ -182,6 +171,14 @@ app.handleDefinitonModal = async function (event) {
       app.displayDefinitions(res, query);
       return res;
     });
+
+  // get top and left offset parameters for Modal position
+  const modalTop =
+    event.currentTarget.offsetTop + event.currentTarget.offsetHeight + 5;
+  const modalLeft = event.currentTarget.offsetLeft;
+
+  //display definition Modal
+  app.displayDefinitionsModal(modalTop, modalLeft);
 
   //attach an event listener to close Modal if mouse clicked outside of Modal
   app.modalEventListener();
@@ -205,11 +202,10 @@ app.handleDefinitonModal = async function (event) {
 app.modalEventListener = function () {
   // checks to see if click is in modal, closes if not
   $(document).on("click", function (e) {
+    // Boolean: is the modal or a child of the modal
     let isModal =
       $(e.target).is("#definitionsModal") ||
       $(e.target).is("#definitionsModal *");
-    console.log($(e.target).closest("#definitionsModal").length);
-    console.log(e.target);
     if (!$(e.target).closest("#definitionsModal").length && !isModal) {
       $("#definitionsModal").addClass("hide");
       $(document).off("click");
@@ -248,6 +244,7 @@ app.init = () => {
     }
   });
 
+  // on search form submission, display sentence and listen for word clicks
   $(".searchForm").on("submit", function (e) {
     e.preventDefault();
     const sentence = $("#searchField").val().trim();
