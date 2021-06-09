@@ -31,6 +31,11 @@ app.getThesaurusReference = word => {
 app.wordClickListener = function () {
   // event listener to look up definitions when span clicked
   $("span").on("click", function (e) {
+    // hide modal in case it's already open
+    $("#definitionsModal").addClass("hide");
+    // turn off modal listener in case it's already open
+    $(document).off("click");
+
     // get top and left offset parameters for Modal
     const top = e.currentTarget.offsetTop + e.currentTarget.offsetHeight + 5;
     const left = e.currentTarget.offsetLeft;
