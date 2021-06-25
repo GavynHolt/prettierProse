@@ -8,37 +8,39 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <header>
-      <h1>Project 2: Prettier Prose</h1>
-      <h2>Make words... wordier</h2>
+    <header class="wrapper">
+      <div class="headerContent">
+        <h1>Project 2: Prettier Prose</h1>
+        <h2>Make words... wordier</h2>
+      </div>
     </header>
 
-    <main>
-      <button class="startOver hide" onclick="app.startOver()">
-        Start Over
-      </button>
-      <h3 class="instructions">
-        To start: Type a sentence that is in need of a fresh perspective, and
-        submit!
-      </h3>
-      <div class="searchForm">
-        <form action="submit">
-          <label for="searchField">Type a sentence:</label>
-          <textarea
-            rows="5"
-            name="searchField"
-            id="searchField"
-            placeholder='ex: "They&apos;re humid, prepossessing Homo sapiens with full-sized aortic pumps."'
-          ></textarea>
-          <input type="submit" value="Next!" />
-        </form>
-      </div>
-
-      <div class="sentenceContainer"></div>
-
-      <div id="definitionsModalRoot">
-        <div id="definitionsModal" class="hide">
-          <!-- Definition boxes will be generated here -->
+    <main class="wrapper">
+      <div class="mainContent">
+        <button class="startOver hide" onclick="app.startOver()">
+          Start Over
+        </button>
+        <h3 class="instructions">
+          To start: Type a sentence that is in need of a fresh perspective, and
+          submit!
+        </h3>
+        <div class="searchForm">
+          <form action="submit">
+            <label for="searchField">Type a sentence:</label>
+            <textarea
+              rows="5"
+              name="searchField"
+              id="searchField"
+              placeholder='ex: "They&apos;re humid, prepossessing Homo sapiens with full-sized aortic pumps."'
+            ></textarea>
+            <input type="submit" value="Next!" />
+          </form>
+        </div>
+        <div class="sentenceContainer"></div>
+        <div id="definitionsModalRoot">
+          <div id="definitionsModal" class="hide">
+            <!-- Definition boxes will be generated here -->
+          </div>
         </div>
       </div>
     </main>
